@@ -1,0 +1,335 @@
+/* Final Mobile Optimization and Touch Enhancements */
+
+/* Touch-friendly button sizing */
+@media (max-width: 768px) {
+    /* Ensure all interactive elements are at least 44px for touch */
+    button, .btn, .feature-link, .nav-links a, .hamburger-menu {
+        min-height: 44px;
+        min-width: 44px;
+        padding: 12px 20px;
+    }
+    
+    /* Hamburger menu touch optimization */
+    .hamburger-menu {
+        padding: 15px;
+        margin: 5px;
+    }
+    
+    /* Navigation links touch optimization */
+    .nav-links a {
+        padding: 15px 25px;
+        font-size: 1.1em;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    /* Feature cards mobile optimization */
+    .feature-card, .feature-item {
+        margin-bottom: 20px;
+        padding: 25px 20px;
+        border-radius: 15px;
+    }
+    
+    /* Text sizing for mobile readability */
+    body {
+        font-size: 16px;
+        line-height: 1.6;
+    }
+    
+    h1 {
+        font-size: 2.2em;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+    
+    h2 {
+        font-size: 1.8em;
+        text-align: center;
+        margin-bottom: 15px;
+    }
+    
+    h3 {
+        font-size: 1.4em;
+        margin-bottom: 10px;
+    }
+    
+    /* Center content on mobile */
+    .container, .features-container, .about-container {
+        text-align: center;
+        padding: 20px 15px;
+    }
+    
+    /* Mobile-specific grid layouts */
+    .features-grid, .tech-grid, .philosophy-grid, .influences-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    /* Optimize spacing for mobile */
+    .full-height-section {
+        padding: 60px 0 40px 0;
+        min-height: auto;
+    }
+    
+    /* Mobile hero section */
+    .hero-section {
+        padding: 40px 20px;
+        text-align: center;
+    }
+    
+    .hero-title {
+        font-size: 2.5em;
+        margin-bottom: 20px;
+    }
+    
+    .hero-subtitle {
+        font-size: 1.1em;
+        margin-bottom: 30px;
+    }
+    
+    /* Mobile-friendly animations */
+    .feature-item:hover, .tech-highlight:hover, .philosophy-item:hover {
+        transform: translateY(-3px);
+    }
+    
+    /* Reduce animation intensity on mobile */
+    @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+        }
+    }
+    
+    /* Mobile scrolling optimization */
+    body {
+        -webkit-overflow-scrolling: touch;
+        scroll-behavior: smooth;
+    }
+    
+    /* Prevent horizontal scroll */
+    body, html {
+        overflow-x: hidden;
+        max-width: 100vw;
+    }
+    
+    /* Mobile-specific button styles */
+    .game-button, .control-button, .feature-link {
+        font-size: 1em;
+        padding: 15px 25px;
+        border-radius: 25px;
+        margin: 10px 5px;
+        display: inline-block;
+        text-align: center;
+    }
+    
+    /* Mobile canvas and visualization optimization */
+    canvas {
+        max-width: 100%;
+        height: auto;
+        touch-action: manipulation;
+    }
+    
+    /* Mobile form elements */
+    select, input {
+        font-size: 16px; /* Prevents zoom on iOS */
+        padding: 12px 15px;
+        border-radius: 10px;
+        min-height: 44px;
+    }
+    
+    /* Mobile-specific sticky header adjustments */
+    .sticky-header {
+        padding: 10px 0;
+        backdrop-filter: blur(15px);
+    }
+    
+    .sticky-header .logo {
+        font-size: 1.4em;
+    }
+    
+    /* Mobile navigation menu improvements */
+    .nav-links {
+        padding-top: 80px; /* Account for header height */
+        max-height: 100vh;
+        overflow-y: auto;
+    }
+    
+    /* Mobile-specific visual enhancements */
+    .retro-badge {
+        padding: 20px;
+        margin: 20px auto;
+        max-width: 200px;
+    }
+    
+    /* Mobile learning path */
+    .learning-path {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .path-arrow {
+        transform: rotate(90deg);
+        margin: 10px 0;
+    }
+    
+    /* Mobile tech stack */
+    .tech-stack {
+        justify-content: center;
+        text-align: center;
+    }
+    
+    /* Mobile-specific hover states (touch devices) */
+    @media (hover: none) and (pointer: coarse) {
+        .feature-item:hover, .tech-highlight:hover, .philosophy-item:hover {
+            transform: none;
+        }
+        
+        .feature-item:active, .tech-highlight:active, .philosophy-item:active {
+            transform: scale(0.98);
+            transition: transform 0.1s ease;
+        }
+    }
+}
+
+/* Tablet-specific optimizations */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .features-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .tech-grid, .philosophy-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .container, .features-container, .about-container {
+        padding: 30px 25px;
+    }
+}
+
+/* Large mobile devices */
+@media (min-width: 481px) and (max-width: 768px) {
+    .hero-title {
+        font-size: 3em;
+    }
+    
+    .features-grid {
+        grid-template-columns: 1fr;
+        max-width: 500px;
+        margin: 0 auto;
+    }
+}
+
+/* Small mobile devices */
+@media (max-width: 480px) {
+    .hero-title {
+        font-size: 2em;
+        line-height: 1.2;
+    }
+    
+    .hero-subtitle {
+        font-size: 1em;
+    }
+    
+    .container, .features-container, .about-container {
+        padding: 15px 10px;
+    }
+    
+    .feature-item, .tech-highlight, .philosophy-item {
+        padding: 20px 15px;
+    }
+    
+    .hamburger-menu {
+        padding: 12px;
+    }
+    
+    .nav-links a {
+        padding: 12px 20px;
+        font-size: 1em;
+    }
+}
+
+/* Landscape orientation on mobile */
+@media (max-width: 768px) and (orientation: landscape) {
+    .full-height-section {
+        min-height: auto;
+        padding: 40px 0 20px 0;
+    }
+    
+    .hero-section {
+        padding: 20px;
+    }
+    
+    .nav-links {
+        padding-top: 60px;
+    }
+}
+
+/* High DPI displays */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .logo, .hero-title {
+        text-rendering: optimizeLegibility;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    /* Already handled by main theme, but ensure mobile-specific elements are covered */
+    .mobile-specific-element {
+        background: rgba(26, 26, 46, 0.95);
+        color: #e0e0e0;
+    }
+}
+
+/* Accessibility improvements for mobile */
+@media (max-width: 768px) {
+    /* Focus indicators for keyboard navigation */
+    button:focus, a:focus, select:focus, input:focus {
+        outline: 3px solid #00ffff;
+        outline-offset: 2px;
+    }
+    
+    /* Ensure sufficient color contrast */
+    .low-contrast-text {
+        color: #ffffff;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+    }
+    
+    /* Skip to content link for screen readers */
+    .skip-to-content {
+        position: absolute;
+        top: -40px;
+        left: 6px;
+        background: #000;
+        color: #fff;
+        padding: 8px;
+        text-decoration: none;
+        z-index: 1000;
+    }
+    
+    .skip-to-content:focus {
+        top: 6px;
+    }
+}
+
+/* Performance optimizations for mobile */
+@media (max-width: 768px) {
+    /* Reduce complex animations on mobile */
+    .complex-animation {
+        animation: none;
+    }
+    
+    /* Optimize background images */
+    .background-image {
+        background-attachment: scroll; /* Fixed backgrounds can cause performance issues on mobile */
+    }
+    
+    /* Optimize transforms for better performance */
+    .hardware-accelerated {
+        transform: translateZ(0);
+        will-change: transform;
+    }
+}

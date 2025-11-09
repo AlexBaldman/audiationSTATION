@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pitch Training - AUDIATION STATION</title>
+    <link rel="stylesheet" href="styles-modern.css">
+    <link rel="stylesheet" href="enhanced-mobile-navigation.css">
+    <link rel="stylesheet" href="sticky-header.css">
+    <style>
+        .pitch-training-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            padding: 20px;
+            min-height: 80vh;
+        }
+        
+        .game-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .score-display {
+            font-size: 2.5em;
+            color: #00ffff;
+            text-shadow: 0 0 15px #00ffff;
+            background: rgba(0, 255, 255, 0.1);
+            border: 2px solid #00ffff;
+            border-radius: 15px;
+            padding: 15px 30px;
+            margin: 10px;
+        }
+        
+        .target-note {
+            font-size: 4em;
+            font-weight: bold;
+            color: #ff66cc;
+            text-shadow: 0 0 20px #ff66cc, 0 0 40px #ff66cc;
+            background: rgba(255, 102, 204, 0.1);
+            border: 3px solid #ff66cc;
+            border-radius: 20px;
+            padding: 30px;
+            margin: 20px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .accuracy-meter {
+            width: 300px;
+            height: 30px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid #ffff00;
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .accuracy-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #ff0000, #ffff00, #00ff00);
+            width: 0%;
+            transition: width 0.1s ease;
+            border-radius: 13px;
+        }
+        
+        .game-controls {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .game-button {
+            background: linear-gradient(45deg, #ff66cc, #00ffff);
+            color: #000;
+            border: none;
+            padding: 15px 25px;
+            font-size: 1.1em;
+            font-weight: bold;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 10px rgba(255, 102, 204, 0.5);
+        }
+        
+        .game-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(255, 102, 204, 0.8);
+        }
+        
+        .game-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .feedback-message {
+            font-size: 1.5em;
+            font-weight: bold;
+            text-align: center;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .correct { color: #00ff00; text-shadow: 0 0 10px #00ff00; }
+        .close { color: #ffff00; text-shadow: 0 0 10px #ffff00; }
+        .off { color: #ff6600; text-shadow: 0 0 10px #ff6600; }
+        
+        .microphone-selection {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .microphone-selection label {
+            font-size: 1.2em;
+            color: #00ffff;
+            text-shadow: 0 0 5px #00ffff;
+        }
+        
+        .mic-dropdown {
+            background: linear-gradient(135deg, rgba(0, 0, 34, 0.9), rgba(10, 10, 51, 0.9));
+            border: 2px solid #00ffff;
+            border-radius: 8px;
+            color: #00ff99;
+            padding: 10px 15px;
+            font-size: 1em;
+            font-family: "Press Start 2P", cursive;
+            min-width: 250px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .mic-dropdown:hover {
+            border-color: #ff66cc;
+            box-shadow: 0 0 10px rgba(255, 102, 204, 0.5);
+        }
+        
+        .mic-dropdown:focus {
+            outline: none;
+            border-color: #ffff00;
+            box-shadow: 0 0 15px rgba(255, 255, 0, 0.7);
+        }
+        
+        .mic-dropdown option {
+            background: #000022;
+            color: #00ff99;
+            padding: 5px;
+        }
+    </style>
+</head>
+<body>
+    <header class="sticky-header">
+        <div class="container">
+            <div class="logo">AUDIATION STATION</div>
+            <nav class="main-nav">
+                <button class="hamburger-menu" aria-label="Toggle navigation">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="full-height-section">
+            <div class="pitch-training-container">
+                <div class="game-header">
+                    <h1>🎯 Pitch Training Game</h1>
+                    <p>Match the target note with your voice or instrument!</p>
+                </div>
+                
+                <div class="score-display">Score: <span id="score">0</span></div>
+                
+                <div class="microphone-selection">
+                    <label for="pitch-microphone-select">🎤 Select Microphone:</label>
+                    <select id="pitch-microphone-select" class="mic-dropdown">
+                        <option value="">Loading microphones...</option>
+                    </select>
+                </div>
+                
+                <div class="target-note" id="target-note">C4</div>
+                
+                <div class="accuracy-meter">
+                    <div class="accuracy-bar" id="accuracy-bar"></div>
+                </div>
+                
+                <div class="feedback-message" id="feedback-message">Click "Start Game" to begin!</div>
+                
+                <div class="game-controls">
+                    <button id="start-game" class="game-button">🎮 Start Game</button>
+                    <button id="stop-game" class="game-button" disabled>⏹️ Stop Game</button>
+                    <button id="new-note" class="game-button" disabled>🎲 New Note</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="hamburger-menu.js"></script>
+    <script src="pitch-training.js"></script>
+</body>
+</html>
