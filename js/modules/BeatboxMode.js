@@ -33,8 +33,49 @@ export class BeatboxMode {
         this.rows = ['kick', 'snare', 'hihat', 'cymbal'];
         this.gridState = new Map();
         this.patterns = this.getPatternDefinitions();
+        this.storageKey = 'audiation-beatbox-state';
+        this.activePattern = 'default';
+        this.isRestoring = false;
 
         this.init();
+    }
+
+    persistState() {
+        if (typeof window === 'undefined' || !window.localStorage) return;
+        const payload = {
+            pattern: this.activePattern,
+            stepsPerBar: this.stepsPerBar,
+            rows: this.rows.map(row => ({
+                name: row,
+                steps: Array.from({ length: this.stepsPerBar }, (_, index) => this.gridState.get(`${row}-${index}`) ? index : null).filter((value) => value !== null),
+            })),
+        };
+        try {
+            window.localStorage.setItem(this.storageKey, JSON.stringify(payload));
+        } catch (error) {
+            console.warn('Unable to persist beatbox state', error);
+        }
+    }
+
+    loadState() {
+        if (typeof window === 'undefined' || !window.localStorage) return;
+        try {
+            const raw = window.localStorage.getItem(this.storageKey);
+            if (!raw) return;
+            const state = JSON.parse(raw);
+            if (!state?.rows) return;
+            this.isRestoring = true;
+            this.applyPattern(state.pattern || 'default');
+            this.gridState.clear();
+            this.gridContainer?.querySelectorAll('.grid-step').forEach(step => step.classList.remove('active'));
+            state.rows.forEach(row => {
+                row.steps?.forEach(stepIndex => this.toggleGridStep(row.name, stepIndex, true));
+            });
+        } catch (error) {
+            console.warn('Failed to load beatbox state', error);
+        } finally {
+            this.isRestoring = false;
+        }
     }
 
     init() {
@@ -45,6 +86,7 @@ export class BeatboxMode {
         this.buildGrid();
         this.attachTransport();
         this.applyPattern('default');
+        this.loadState();
     }
 
     setupAudioContext() {
@@ -249,6 +291,7 @@ export class BeatboxMode {
         const shouldActivate = forceActive !== null ? forceActive : !this.gridState.get(key);
         this.gridState.set(key, shouldActivate);
         stepEl.classList.toggle('active', shouldActivate);
+        if (!this.isRestoring) this.persistState();
     }
 
     attachTransport() {
@@ -309,6 +352,7 @@ export class BeatboxMode {
 
     applyPattern(patternKey) {
         const pattern = this.patterns[patternKey] || this.patterns.default;
+        this.activePattern = patternKey in this.patterns ? patternKey : 'default';
         this.gridState.clear();
         this.gridContainer?.querySelectorAll('.grid-step').forEach(step => step.classList.remove('active'));
         this.rows.forEach((row, rowIndex) => {
@@ -316,6 +360,7 @@ export class BeatboxMode {
             steps.forEach(stepIndex => this.toggleGridStep(row, stepIndex, true));
         });
         if (this.gridInfo) this.gridInfo.textContent = pattern.description;
+        if (!this.isRestoring) this.persistState();
     }
 
     getPatternDefinitions() {

@@ -70,12 +70,18 @@ The code in `js/modules` attempts to mitigate these issues where possible. It is
 
 ### Future Work
 
-The backlog is a set of questions, not a list of features.
+The backlog is a set of questions and provocations, not a list of features.
 
--   Can we implement a more robust pitch detection algorithm (like YIN or MPM) in WASM for better performance?
--   What is the practical limit for the number of concurrent audio sources before performance degrades unacceptably?
--   Can we build a reliable, cross-browser worklet-based audio recorder?
+-   **The Dojo: A Unified Training Ground**
+    -   `[ ]` **Dynamic Exercise Generation:** Can we build an algorithm that generates daily exercises based on a user's performance data?
+    -   `[ ]` **"Sparring" Mode:** A real-time call-and-response game. How low can we get the latency?
+    -   `[ ]` **"Meditation" Mode:** A free-play mode with real-time harmonic analysis. Can we provide meaningful feedback without being prescriptive?
 
-Contributions that attempt to answer these questions are welcome. Submit a pull request. Keep it clean. Clean code is a force multiplier.  multiplier.  multiplier.
+-   **The Forge: A Beat-Making Playground**
+    -   `[ ]` **Polyrhythm & Euclidean Sequencers:** Move beyond the 4/4 grid.
+    -   `[ ]` **"Sample Alchemy":** User-provided samples in the sequencer. What are the performance implications?
 
-...Just kidding. But seriously, keep it clean. 🧼
+-   **The Oracle: Advanced Ear Training**
+    -   `[ ]` **Chord Progression & Timbre Training:** Can we teach the *structure* and *texture* of sound, not just the pitch?
+
+Contributions that attempt to answer these questions are welcome. Submit a pull request. Keep it clean. Clean code is a force multiplier. 🧼

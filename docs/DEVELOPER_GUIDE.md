@@ -90,4 +90,40 @@ The project uses **Vite** to handle the development server and the production bu
     -   CSS classes: `kebab-case`.
 -   **Asynchronicity:** Use `async/await` for handling promises, especially for microphone access and other browser APIs.
 -   **DOM Manipulation:** Keep DOM manipulation logic within the `js/pages/` scripts. Core modules in `js/modules/` should ideally not have direct knowledge of the DOM.
--   **Comments:** Add comments to explain the *why* behind complex code, especially in the audio processing modules. The *what* should be clear from the code itself.
+## 7. Development Roadmap
+
+This roadmap outlines the planned features and technical challenges for future development.
+
+### Q1: The Dojo - Unified Training Ground
+
+-   **Objective:** Create a central hub for adaptive, personalized music training.
+-   **Tasks:**
+    -   `[ ]` Design and implement the Dojo UI.
+    -   `[ ]` Develop a dynamic exercise generation algorithm that analyzes user performance data (e.g., pitch accuracy, interval recognition speed) to create tailored practice sessions.
+    -   `[ ]` Build the "Sparring" mode: a low-latency, call-and-response audio game.
+    -   `[ ]` Implement the "Meditation" mode's real-time harmonic analysis engine. This will likely involve creating a new module for music theory calculations.
+
+### Q2: The Forge - Advanced Beat-Making
+
+-   **Objective:** Evolve the beatbox into a more powerful and creative rhythm tool.
+-   **Tasks:**
+    -   `[ ]` Implement a Polyrhythm Mode, allowing for the creation of beats with multiple simultaneous time signatures.
+    -   `[ ]` Add a Euclidean sequencing option for generating complex and organic rhythms.
+    -   `[ ]` Develop the "Sample Alchemy" feature:
+        -   `[ ]` Implement audio recording and slicing for user-created samples.
+        -   `[ ]` Build a simple sample mapping interface.
+        -   `[ ]` Investigate the performance implications of using user-provided samples in the audio engine.
+
+### Q3: The Oracle - Advanced Ear Training
+
+-   **Objective:** Expand the ear training module to cover more advanced music theory concepts.
+-   **Tasks:**
+    -   `[ ]` Create a chord progression generation and recognition engine.
+    -   `[ ]` Build the "Interval Sprints" game, focusing on rapid-fire recognition.
+    -   `[ ]` Implement the "Timbre Training" module, which will require a library of diverse instrument sounds.
+
+### Ongoing Technical Challenges
+
+-   **Latency Reduction:** Continuously profile and optimize the audio processing pipeline to minimize latency.
+-   **Cross-Browser Compatibility:** Ensure all features work reliably across the latest versions of major browsers.
+-   **Performance on Mobile:** Optimize for performance on lower-powered mobile devices.
