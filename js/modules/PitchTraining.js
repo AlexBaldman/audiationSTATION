@@ -1,5 +1,6 @@
 import { frequencyToNote } from './PitchUtils.js';
 import { createAudioContext, stopMediaStream, closeAudioContext, cancelAnimationFrameSafe } from './AudioResourceManager.js';
+import { createPitchArcade } from './gamified/index.js';
 
 export class PitchTraining {
     constructor() {
@@ -21,6 +22,8 @@ export class PitchTraining {
         this.difficultySelect = document.getElementById("pitch-difficulty");
         this.instrumentSelect = document.getElementById("instrument-select");
         this.playTargetNoteButton = document.getElementById("play-target-note");
+        this.pitchGameSelect = document.getElementById('pitch-game-mode');
+        this.pitchGameCanvas = document.getElementById('pitch-game-canvas');
 
         this.audioContext = null;
         this.analyser = null;
@@ -42,6 +45,9 @@ export class PitchTraining {
         this.nextNoteTimeout = null;
         this.boundVisibilityHandler = null;
         this.boundUnloadHandler = null;
+        this.pitchEngine = null;
+        this.pitchGameMode = 'off';
+        this.pitchArcadeStorageKey = 'pitchArcadeMode';
 
         this.noteFrequencies = {
             "C4": 261.63, "D4": 293.66, "E4": 329.63, "F4": 349.23,
@@ -55,6 +61,7 @@ export class PitchTraining {
         };
 
         this.init();
+        this.setupPitchArcade();
         this.attachLifecycleHooks();
     }
 
@@ -103,9 +110,11 @@ export class PitchTraining {
         }
     }
 
-    updatePitchMeter(userFrequency) {
+    updatePitchMeter(userFrequency, centsOverride) {
         if (!this.targetFrequency || !this.pitchIndicator) return;
-        const cents = 1200 * Math.log2(userFrequency / this.targetFrequency);
+        const cents = typeof centsOverride === 'number'
+            ? centsOverride
+            : 1200 * Math.log2(userFrequency / this.targetFrequency);
         const position = Math.max(-50, Math.min(50, cents));
         this.pitchIndicator.style.left = `calc(50% + ${position}%)`;
         if (Math.abs(cents) < 10) {
@@ -148,8 +157,11 @@ export class PitchTraining {
             const noteInfo = frequencyToNote(userFrequency, { minFrequency: 80, maxFrequency: 1500, maxCentError: 80 });
             const userNote = noteInfo?.note || '---';
             if (this.userNoteDisplay) this.userNoteDisplay.textContent = `You: ${userNote} (${userFrequency.toFixed(2)} Hz)`;
-            this.updatePitchMeter(userFrequency);
-            if (userNote === this.targetNote && Math.abs(1200 * Math.log2(userFrequency / this.targetFrequency)) < 15) {
+            const cents = 1200 * Math.log2(userFrequency / this.targetFrequency);
+            this.updatePitchMeter(userFrequency, cents);
+            const onTarget = userNote === this.targetNote && Math.abs(cents) < 15;
+            this.updatePitchEngineSample({ cents, onTarget, rms });
+            if (onTarget) {
                 if (this.noteMatchedTime === 0) {
                     this.noteMatchedTime = Date.now();
                 }
@@ -178,6 +190,7 @@ export class PitchTraining {
         } else {
             if (this.userNoteDisplay) this.userNoteDisplay.textContent = "You: ---";
             if (this.guidanceDisplay) this.guidanceDisplay.textContent = 'Increase input volume or sing a clear note';
+            this.updatePitchEngineSample({ cents: 0, onTarget: false, rms });
         }
         const raf = typeof window !== 'undefined' ? window.requestAnimationFrame : null;
         if (this.isTraining && raf) {
@@ -211,6 +224,7 @@ export class PitchTraining {
                 }
             }, 1000);
             this.detectPitchLoop();
+            this.handleArcadeStart();
         } catch (error) {
             if (this.feedbackMessage) this.feedbackMessage.textContent = "❌ Error: " + error.message;
             this.stop();
@@ -238,6 +252,7 @@ export class PitchTraining {
         if (this.feedbackMessage) this.feedbackMessage.textContent = `Game Over! Final Score: ${this.score}`;
         if (this.targetNoteDisplay) this.targetNoteDisplay.textContent = "Target: ---";
         if (this.userNoteDisplay) this.userNoteDisplay.textContent = "You: ---";
+        this.handleArcadeStop();
     }
 
     attachLifecycleHooks() {
@@ -269,5 +284,95 @@ export class PitchTraining {
     dispose() {
         this.stop();
         this.detachLifecycleHooks();
+        this.pitchEngine?.dispose?.();
+        this.pitchEngine = null;
+    }
+
+    setupPitchArcade() {
+        if (!this.pitchGameCanvas) return;
+        try {
+            this.pitchEngine = createPitchArcade(this.pitchGameCanvas);
+            this.pitchEngine.addEventListener('scene-event', (event) => this.handleSceneEvent(event));
+        } catch (error) {
+            console.warn('Pitch arcade unavailable:', error);
+            this.pitchEngine = null;
+            return;
+        }
+        const savedMode = this.getStoredArcadeMode();
+        const initialMode = savedMode || (this.pitchGameSelect?.value ?? 'off');
+        if (this.pitchGameSelect) {
+            this.pitchGameSelect.value = initialMode;
+            this.pitchGameSelect.addEventListener('change', (event) => {
+                this.setPitchGameMode(event.target.value);
+            });
+        }
+        this.setPitchGameMode(initialMode);
+    }
+
+    setPitchGameMode(mode = 'off') {
+        this.pitchGameMode = mode;
+        this.storeArcadeMode(mode);
+        if (!this.pitchEngine) return;
+        if (mode === 'off') {
+            this.pitchEngine.setMode('off');
+            this.pitchEngine.pause();
+            this.togglePitchGameVisibility(false);
+            return;
+        }
+        this.togglePitchGameVisibility(true);
+        this.pitchEngine.setMode(mode);
+        if (this.isTraining) {
+            this.pitchEngine.start();
+        } else {
+            this.pitchEngine.pause();
+        }
+    }
+
+    togglePitchGameVisibility(enable) {
+        const container = this.pitchGameCanvas?.closest('.pitch-game');
+        if (this.pitchGameCanvas) {
+            this.pitchGameCanvas.style.display = enable ? 'block' : 'none';
+        }
+        if (container) {
+            container.style.opacity = enable ? '1' : '0.4';
+        }
+    }
+
+    updatePitchEngineSample(sample) {
+        if (!this.pitchEngine || this.pitchGameMode === 'off') return;
+        this.pitchEngine.updatePitch(sample);
+    }
+
+    handleArcadeStart() {
+        if (!this.pitchEngine || this.pitchGameMode === 'off') return;
+        this.pitchEngine.start();
+    }
+
+    handleArcadeStop() {
+        if (!this.pitchEngine) return;
+        this.pitchEngine.pause();
+    }
+
+    handleSceneEvent(event) {
+        this.lastSceneEvent = event;
+    }
+
+    storeArcadeMode(mode) {
+        if (typeof window === 'undefined' || !window.localStorage) return;
+        try {
+            window.localStorage.setItem(this.pitchArcadeStorageKey, mode);
+        } catch (error) {
+            console.warn('Unable to persist arcade mode', error);
+        }
+    }
+
+    getStoredArcadeMode() {
+        if (typeof window === 'undefined' || !window.localStorage) return null;
+        try {
+            return window.localStorage.getItem(this.pitchArcadeStorageKey);
+        } catch (error) {
+            console.warn('Unable to read arcade mode', error);
+            return null;
+        }
     }
 }

@@ -244,6 +244,15 @@ select {
     margin-top: 8px;
     color: rgba(224, 224, 224, 0.8);
 }
+.feature-tip {
+    width: 100%;
+    font-size: 0.9rem;
+    padding: 10px 12px;
+    border-left: 3px solid var(--color-secondary-neon);
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 6px;
+    color: rgba(255, 255, 255, 0.85);
+}
 
 /* Recorder */
 .audio-recorder-container {

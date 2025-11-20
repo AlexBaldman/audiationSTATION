@@ -25,6 +25,7 @@ export class BeatboxMode {
         this.patternSelect = document.getElementById('beatbox-pattern');
         this.gridContainer = document.getElementById('beatbox-grid-steps');
         this.gridInfo = document.getElementById('beatbox-grid-info');
+        this.randomizeBtn = document.getElementById('beatbox-randomize');
 
         this.currentStep = 0;
         this.isPlaying = false;
@@ -118,6 +119,29 @@ export class BeatboxMode {
             hihat: this.createHiHatSound(),
             cymbal: this.createCymbalSound()
         };
+    }
+
+    randomizeGrid() {
+        this.isRestoring = true;
+        this.gridState.clear();
+        this.gridContainer?.querySelectorAll('.grid-step').forEach(step => step.classList.remove('active'));
+        const densityMap = {
+            kick: 0.35,
+            snare: 0.25,
+            hihat: 0.5,
+            cymbal: 0.2,
+        };
+        this.rows.forEach(row => {
+            const density = densityMap[row] ?? 0.3;
+            for (let i = 0; i < this.stepsPerBar; i++) {
+                if (Math.random() < density) {
+                    this.toggleGridStep(row, i, true);
+                }
+            }
+        });
+        this.isRestoring = false;
+        this.persistState();
+        if (this.gridInfo) this.gridInfo.textContent = 'Randomized Sacred Grid — tweak live with pads or keyboard.';
     }
 
     createKickSound() {
@@ -308,6 +332,7 @@ export class BeatboxMode {
         this.patternSelect?.addEventListener('change', (event) => {
             this.applyPattern(event.target.value);
         });
+        this.randomizeBtn?.addEventListener('click', () => this.randomizeGrid());
     }
 
     startSequencer() {

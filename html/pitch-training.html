@@ -88,6 +88,18 @@
                         </div>
                     </div>
                     <div id="pitch-guidance" class="pitch-guidance">Press Start to begin calibration.</div>
+                    <p class="feature-tip">Tip: Watch the guidance text—green means you’re within ±10¢. Hold it for 500ms to score combo points.</p>
+                    <div class="pitch-game">
+                        <div class="pitch-game-header">
+                            <h3>Pitch Arcade</h3>
+                            <select id="pitch-game-mode">
+                                <option value="gatekeeper">Gatekeeper</option>
+                                <option value="off">Disable</option>
+                            </select>
+                        </div>
+                        <canvas id="pitch-game-canvas" width="480" height="220" aria-label="Pitch arcade visualization"></canvas>
+                        <p class="feature-tip pitch-game-tip">Guide the orb through each gate by matching the note height. Future modes (skater, skyline) will join this arcade.</p>
+                    </div>
                 </div>
             </div>
         </section>

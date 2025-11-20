@@ -20,20 +20,24 @@
 ### Note Detection Lab
 - Replace current LED indicators with a “Geometry Scope”: each detected note draws a triangle from center; intervals stack to create evolving mandalas.
 - Chord detection animates Platonic solid nets; e.g., major triad ➜ tetrahedron overlay.
+- **Status:** Geometry Scope v1 now ships in note-detection UI (canvas + module). It draws radial grids, note vectors, and chord polygons. Next iteration: alpha trails for velocity + WASM-based smoothing.
 
 ### Pitch Training
 - Display player's pitch as a moving point along a torus ring; distance from target note is height offset, color-coded.
 - Gamify accuracy with shape-matching mini challenges (match the “triangle” by holding perfect third for a duration).
+- **Status:** UX shows cent deviation guidance, volume meter, streak/accuracy stats, and coaching copy. Consider layering torus/mandala overlay once Three.js perf budget confirmed.
 
 ### Beatbox Sequencer
 - Introduce “Sacred Grid” mode: step lengths follow Fibonacci (1/1/2/3/5/8) or 3-4-5 polyrhythm templates.
 - Visualize active steps as rotating polygons; using color saturation for velocity.
+- **Status:** Sacred Grid sequencer is live with Default/Fibonacci/Trinity/Golden patterns, keyboard-to-grid capture, playhead glow, and state persistence. Next frontier: on-canvas geometry overlay + ability to morph ratios in real time.
 
 ## 4. Implementation roadmap
-1. **Shared Geometry Palette** – Create `/css/geometry.css` with CSS custom properties for sacred hues, gradients.
-2. **Canvas/Radar Component** – Build reusable `GeometryScope.js` module that accepts note/chord events and maps them to shapes.
-3. **Rhythm Engine Enhancements** – Extend `BeatboxMode` with pattern templates referencing ratio arrays.
-4. **Doc & UX Updates** – Add user-facing guide in README + in-app “Sonic Geometry” info tooltip explaining representations.
+1. ✅ **Geometry Palette** – integrated directly into `main.css`; consider extracting into dedicated file when additional scenes are added.
+2. ✅ **Canvas/Radar Component** – `GeometryScope.js` renders 12-gon, note vectors, chord polygons, and queues RAF for animation.
+3. ✅ **Rhythm Engine Enhancements** – Beatbox Sacred Grid features ratio-based templates + persisted state.
+4. ⏳ **Doc & UX Updates** – add inline tooltips + landing-page highlights for Geometry Scope + Sacred Grid (in progress).
+5. 🔜 **Holographic Visuals** – tie Pitch Training guidance into torus/mandala view + Beatbox canvas overlay.
 
 ## 5. Resources
 - Sonic Geometry I & II documentaries (YouTube/Vimeo)
