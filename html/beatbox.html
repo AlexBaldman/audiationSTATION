@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AUDIATIONstation - Beatbox</title>
+    <link rel="stylesheet" href="/css/main.css">
+</head>
+<body>
+    <header class="sticky-header">
+        <div class="header-container">
+            <div class="logo">
+                <a href="index.html">AUDIATIONstation</a>
+            </div>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="features.html">Features</a></li>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="recorder.html">Recorder</a></li>
+                    <li><a href="pitch-training.html">Pitch Training</a></li>
+                    <li><a href="note-detection.html">Note Detection</a></li>
+                    <li><a href="ear-training.html">Ear Training</a></li>
+                    <li><a href="beatbox.html">Beatbox</a></li>
+                </ul>
+            </nav>
+            <div class="hamburger-menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </header>
+
+    <main class="app-container">
+        <!-- Beatbox Mode Section -->
+        <section id="beatbox" class="app-section beatbox-section">
+            <div class="section-header">
+                <h2 class="section-title">Beatbox Mode</h2>
+                <p class="section-subtitle">Create beats with our "Think Outside the Boombox" feature</p>
+            </div>
+            <div class="section-content">
+                <div class="beatbox-layout">
+                    <div class="beatbox-container">
+                        <div class="beatbox-pad" data-sound="kick">
+                            <div class="pad-icon">🥁</div>
+                            <div class="pad-label">Kick</div>
+                        </div>
+                        <div class="beatbox-pad" data-sound="snare">
+                            <div class="pad-icon">🎵</div>
+                            <div class="pad-label">Snare</div>
+                        </div>
+                        <div class="beatbox-pad" data-sound="hihat">
+                            <div class="pad-icon">🔔</div>
+                            <div class="pad-label">Hi-Hat</div>
+                        </div>
+                        <div class="beatbox-pad" data-sound="cymbal">
+                            <div class="pad-icon">🎶</div>
+                            <div class="pad-label">Cymbal</div>
+                        </div>
+                    </div>
+
+                    <div class="beatbox-controls">
+                        <div class="transport">
+                            <button id="beatbox-start" class="btn btn-primary">Play</button>
+                            <button id="beatbox-stop" class="btn btn-secondary" disabled>Stop</button>
+                            <label class="tempo-label">Tempo <span id="beatbox-tempo-value">108 BPM</span></label>
+                            <input type="range" id="beatbox-tempo" min="60" max="180" value="108">
+                        </div>
+                        <div class="pattern-selectors">
+                            <label for="beatbox-pattern">Sacred Grid</label>
+                            <select id="beatbox-pattern">
+                                <option value="default">Default 4/4</option>
+                                <option value="fibonacci">Fibonacci Pulse</option>
+                                <option value="trinity">3:2 Polyrhythm</option>
+                                <option value="golden">Golden Spiral</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="beatbox-grid">
+                        <div class="grid-header">
+                            <span>Kick</span>
+                            <span>Snare</span>
+                            <span>Hi-Hat</span>
+                            <span>Cymbal</span>
+                        </div>
+                        <div id="beatbox-grid-steps" class="grid-steps" aria-label="Sacred grid sequencer"></div>
+                    </div>
+
+                    <div class="beatbox-info">
+                        <h3>Sacred Grid Readout</h3>
+                        <p id="beatbox-grid-info">Select a pattern to see ratios and feel the geometry.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 AUDIATION STATION. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <div id="app-init-message" class="app-init-message hidden">
+        <div class="init-content">
+            <div class="init-spinner"></div>
+            <p class="init-text">Initializing AUDIATION STATION...</p>
+        </div>
+    </div>
+
+    <script type="module" src="../js/pages/beatbox.js"></script>
+</body>
+</html>
