@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AUDIATIONstation - Pitch Training</title>
+    <link rel="stylesheet" href="/css/main.css">
+  <script type="module" crossorigin src="/assets/pitch-training-BMpTU2ub.js"></script>
+  <link rel="modulepreload" crossorigin href="/assets/Navigation-BNncwhjL.js">
+  <link rel="modulepreload" crossorigin href="/assets/PitchUtils-Dm8PaPCI.js">
+  <link rel="modulepreload" crossorigin href="/assets/AudioResourceManager-DnsOnIC-.js">
+</head>
+<body>
+    <header class="sticky-header">
+        <div class="header-container">
+            <div class="logo">
+                <a href="index.html">AUDIATIONstation</a>
+            </div>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="features.html">Features</a></li>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="recorder.html">Recorder</a></li>
+                    <li><a href="pitch-training.html">Pitch Training</a></li>
+                    <li><a href="note-detection.html">Note Detection</a></li>
+                    <li><a href="ear-training.html">Ear Training</a></li>
+                    <li><a href="beatbox.html">Beatbox</a></li>
+                </ul>
+            </nav>
+            <div class="hamburger-menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </header>
+
+    <main class="app-container">
+        <section id="pitch-training" class="app-section pitch-training-section">
+            <div class="section-header">
+                <h2 class="section-title">Pitch Training</h2>
+                <p class="section-subtitle">Hone your vocal accuracy</p>
+            </div>
+            <div class="section-content">
+                <div class="pitch-training-container">
+                    <div class="controls">
+                        <select id="pitch-difficulty">
+                            <option value="easy">Easy</option>
+                            <option value="medium">Medium</option>
+                            <option value="hard">Hard</option>
+                        </select>
+                        <select id="instrument-select">
+                            <option value="sine">Sine</option>
+                            <option value="square">Square</option>
+                            <option value="sawtooth">Sawtooth</option>
+                            <option value="triangle">Triangle</option>
+                        </select>
+                        <button id="start-pitch-training">Start</button>
+                        <button id="stop-pitch-training" disabled>Stop</button>
+                        <button id="play-target-note">Play Note</button>
+                    </div>
+                    <div class="displays">
+                        <div id="target-note">Target: --</div>
+                        <div id="user-note">You: --</div>
+                        <div id="pitch-feedback"></div>
+                        <div id="pitch-score">Score: 0</div>
+                        <div id="pitch-streak">Streak: 0</div>
+                        <div id="pitch-timer">Time: 60s</div>
+                    </div>
+                    <div id="pitch-meter">
+                        <div id="pitch-indicator"></div>
+                    </div>
+                    <div class="pitch-volume">
+                        <div class="pitch-volume-bar">
+                            <div id="pitch-volume-fill"></div>
+                        </div>
+                        <span class="pitch-volume-label">Input signal</span>
+                    </div>
+                    <div class="pitch-session-stats">
+                        <div class="stat-card">
+                            <span class="stat-label">Accuracy</span>
+                            <span class="stat-value" id="pitch-accuracy">0%</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-label">Best Streak</span>
+                            <span class="stat-value" id="pitch-best-streak">0</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-label">Notes Trained</span>
+                            <span class="stat-value" id="pitch-notes-trained">0</span>
+                        </div>
+                    </div>
+                    <div id="pitch-guidance" class="pitch-guidance">Press Start to begin calibration.</div>
+                    <p class="feature-tip">Tip: Watch the guidance text—green means you’re within ±10¢. Hold it for 500ms to score combo points.</p>
+                    <div class="pitch-game">
+                        <div class="pitch-game-header">
+                            <h3>Pitch Arcade</h3>
+                            <select id="pitch-game-mode">
+                                <option value="gatekeeper">Gatekeeper</option>
+                                <option value="off">Disable</option>
+                            </select>
+                        </div>
+                        <canvas id="pitch-game-canvas" width="480" height="220" aria-label="Pitch arcade visualization"></canvas>
+                        <p class="feature-tip pitch-game-tip">Guide the orb through each gate by matching the note height. Future modes (skater, skyline) will join this arcade.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 AUDIATION STATION. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <div id="app-init-message" class="app-init-message hidden">
+        <div class="init-content">
+            <div class="init-spinner"></div>
+            <p class="init-text">Initializing AUDIATION STATION...</p>
+        </div>
+    </div>
+
+</body>
+</html>

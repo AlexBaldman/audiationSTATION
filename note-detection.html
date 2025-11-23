@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AUDIATIONstation - Note Detection</title>
+    <link rel="stylesheet" href="/css/main.css">
+  <script type="module" crossorigin src="/assets/note-detection-Dqq4bogk.js"></script>
+  <link rel="modulepreload" crossorigin href="/assets/Navigation-BNncwhjL.js">
+  <link rel="modulepreload" crossorigin href="/assets/PitchUtils-Dm8PaPCI.js">
+  <link rel="modulepreload" crossorigin href="/assets/AudioResourceManager-DnsOnIC-.js">
+</head>
+<body>
+    <header class="sticky-header">
+        <div class="header-container">
+            <div class="logo">
+                <a href="index.html">AUDIATIONstation</a>
+            </div>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="features.html">Features</a></li>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="recorder.html">Recorder</a></li>
+                    <li><a href="pitch-training.html">Pitch Training</a></li>
+                    <li><a href="note-detection.html">Note Detection</a></li>
+                    <li><a href="ear-training.html">Ear Training</a></li>
+                    <li><a href="beatbox.html">Beatbox</a></li>
+                </ul>
+            </nav>
+            <div class="hamburger-menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </header>
+
+    <main class="app-container">
+        <section id="note-detection" class="app-section note-detection-section">
+            <div class="section-header">
+                <h2 class="section-title">Note Detection</h2>
+                <p class="section-subtitle">Real-time musical note recognition from voice or instruments</p>
+            </div>
+            <div class="section-content">
+                <div class="note-detection-container">
+                    <div class="controls">
+                        <select id="microphone-select"></select>
+                        <button id="start-note-detection">Start</button>
+                        <button id="stop-note-detection" disabled>Stop</button>
+                        <button id="clear-melody">Clear Melody</button>
+                    </div>
+                    <div id="status-message">Inactive</div>
+                    <div class="output">
+                        <div id="note-display">---</div>
+                        <div id="frequency-display">0.00 Hz</div>
+                        <div id="chord-display">---</div>
+                        <div id="octave-display">Octave: -</div>
+                        <div id="scale-display">Scale: -</div>
+                    </div>
+                    <canvas id="waveform-canvas" width="800" height="200"></canvas>
+                    <div class="geometry-scope-wrapper">
+                        <h3 class="geometry-scope-title">Geometry Scope</h3>
+                        <canvas id="geometry-scope-canvas" width="360" height="360" aria-label="Sacred geometry visualizer"></canvas>
+                        <p class="geometry-scope-caption">Notes become shapes. Chords weave mandalas.</p>
+                        <p class="feature-tip">Tip: Hold a note steady to paint longer vectors; stacked intervals will morph into polygons so you can “see” chord stability.</p>
+                    </div>
+                    <div id="visual-keyboard"></div>
+                    <div id="melody-tracker"></div>
+                    <div id="power-led"></div>
+                    <div id="signal-led"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 AUDIATION STATION. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <div id="app-init-message" class="app-init-message hidden">
+        <div class="init-content">
+            <div class="init-spinner"></div>
+            <p class="init-text">Initializing AUDIATION STATION...</p>
+        </div>
+    </div>
+
+</body>
+</html>
