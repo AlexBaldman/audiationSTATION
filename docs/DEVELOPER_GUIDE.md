@@ -94,12 +94,13 @@ npm run deploy
 ```
 
 This command:
-1. Runs `npm run build` so `dist/` always reflects the latest sources.
-2. Invokes `npx gh-pages -d dist -r https://github.com/AlexBaldman/audiationSTATION.git` to publish the artifacts.
+1. Runs `npm run test` before deployment to prevent shipping broken builds.
+2. Runs `npm run build` so `dist/` always reflects the latest sources.
+3. Invokes `npx gh-pages -d dist -r https://github.com/AlexBaldman/audiationSTATION.git` to publish the artifacts.
 
 Benefits:
-- **One-liner workflow**: No need to remember separate build + publish commands.
-- **Consistent output**: The build step always precedes deploy, avoiding stale bundles.
+- **One-liner workflow**: No need to remember separate test/build/publish commands.
+- **Consistent output**: Tests + build always precede deploy, avoiding stale or broken bundles.
 - **Safer pushes**: The script targets the correct repo/branch every time.
 
 ## 6. Coding Conventions

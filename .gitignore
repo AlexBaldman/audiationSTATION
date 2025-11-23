@@ -1,0 +1,11 @@
+node_modules/
+.dist/
+dist/
+dist-*/
+.vite/
+.vscode/
+.DS_Store
+dist/assets/
+node_modules/.cache/
+coverage/
+*.log

@@ -16,10 +16,10 @@ This is a focused exploration into the practical limits of browser audio APIs. I
 
 The `html` directory contains the current set of experiments. They are largely independent.
 
-*   **`note-detection.html`**: Real-time pitch detection using `AnalyserNode`. The core challenge is balancing FFT window size for frequency resolution vs. temporal accuracy.
-*   **`pitch-training.html`**: A gamified interface for pitch matching. A simple feedback loop for the note detection logic.
+*   **`note-detection.html`**: Real-time pitch detection using `AnalyserNode`. The core challenge is balancing FFT window size for frequency resolution vs. temporal accuracy. Geometry Scope visuals live here.
+*   **`pitch-training.html`**: Home of the new **Pitch Arcade**. It embeds the modular `GamifiedPitchEngine` where scenes like **Gatekeeper** translate pitch accuracy into visual gameplay.
 *   **`ear-training.html`**: Basic note identification game.
-*   **`beatbox.html`**: A rudimentary sequencer. Explores timing and scheduling with `AudioContext.currentTime`.
+*   **`beatbox.html`**: Sacred Grid sequencer explores timing and scheduling with `AudioContext.currentTime`.
 *   **`recorder.html`**: Audio capture via `MediaRecorder`. Simple, but it works.
 
 ---
@@ -41,7 +41,27 @@ Prerequisites: `node` and `npm`.
     ```bash
     npm run dev
     ```
-The server will be available at `http://localhost:5173`. The console will provide the exact URL.
+   The server will be available at `http://localhost:5173`. The console will provide the exact URL.
+
+4.  **Test + Deploy**
+    ```bash
+    npm run test   # Vitest coverage (PitchTraining, Beatbox, Gamified engine, etc.)
+    npm run deploy # Runs tests, builds with Vite, publishes to gh-pages
+    ```
+   The project deploys to GitHub Pages at `https://alexbaldman.github.io/audiationSTATION/`. Vite’s `base` is configured accordingly.
+
+---
+
+### Project Structure
+
+```
+html/             # Multi-page entry points (loaded by Vite)
+js/pages/         # Page bootstrap scripts (DOM wiring only)
+js/modules/       # Shared logic (GamifiedPitchEngine, PitchTraining, NoteDetection, etc.)
+css/main.css      # Global styling
+docs/             # Developer & concept docs (GAMIFIED_PITCH_ENGINE, SONIC_GEOMETRY)
+tests/            # Vitest suites for core modules
+```
 
 ---
 

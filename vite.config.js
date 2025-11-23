@@ -14,6 +14,7 @@ const htmlFiles = glob.sync('html/**/*.html').reduce((acc, file) => {
 
 export default defineConfig({
   root: 'html',
+  base: '/audiationSTATION/',
   build: {
     rollupOptions: {
       input: {
