@@ -81,6 +81,27 @@ The project uses **Vite** to handle the development server and the production bu
 -   **Development (`npm run dev`):** Starts a local dev server with Hot Module Replacement (HMR). The server root is the `html/` directory.
 -   **Production (`npm run build`):** Bundles and minifies all assets for production. The output is placed in the `dist/` directory. The `vite.config.js` file automatically finds all HTML files and configures them as Rollup inputs, ensuring a complete build for the multi-page setup.
 
+## Deployment
+
+Run `npm run build` to produce static assets in `dist/`. Upload the contents of `dist/` to your hosting provider (GitHub Pages, Netlify, etc.).
+
+### Automated GitHub Pages deploy
+
+Use the bundled script to push the current build directly to the `gh-pages` branch:
+
+```bash
+npm run deploy
+```
+
+This command:
+1. Runs `npm run build` so `dist/` always reflects the latest sources.
+2. Invokes `npx gh-pages -d dist -r https://github.com/AlexBaldman/audiationSTATION.git` to publish the artifacts.
+
+Benefits:
+- **One-liner workflow**: No need to remember separate build + publish commands.
+- **Consistent output**: The build step always precedes deploy, avoiding stale bundles.
+- **Safer pushes**: The script targets the correct repo/branch every time.
+
 ## 6. Coding Conventions
 
 -   **Modularity:** Use ES Modules (`import`/`export`) for all JavaScript files.
