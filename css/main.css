@@ -749,6 +749,21 @@ select {
     line-height: 1.6;
 }
 
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 0.95;
+    }
+    50% {
+        transform: scale(1.02);
+        opacity: 1;
+    }
+}
+
+.coming-soon-notice {
+    animation: pulse 3s ease-in-out infinite;
+}
+
 /* --- Animations --- */
 @keyframes fadeInUp {
     from {

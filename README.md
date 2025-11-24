@@ -1,6 +1,6 @@
 # AUDIATIONstation 🚀
 
-This is a focused exploration into the practical limits of browser audio APIs. It's a testbed for low-latency audio processing, not a consumer product. The goal is to validate what is possible on the modern web platform with minimal framework overhead.
+A comprehensive web-based music production and ear training application with a focus on low-latency audio processing and modern UI/UX design. This project explores the practical limits of browser audio APIs while providing an intuitive, mobile-first interface for musicians and audio enthusiasts.
 
 ---
 
@@ -8,19 +8,32 @@ This is a focused exploration into the practical limits of browser audio APIs. I
 
 1.  **Minimize Latency.** The speed of light is a hard limit. The browser's event loop is a soft one. We will fight the soft one. Every millisecond matters.
 2.  **Code is Liability.** Write less of it. The architecture is intentionally simple: static HTML files, vanilla JavaScript modules, and a single CSS file. No frameworks. The problem domain is audio processing, not DOM manipulation.
-3.  **Ship It.** A functional experiment is better than a perfect plan. The features here are probes into different aspects of the Web Audio API.
+3.  **Modern UI/UX.** Beautiful, responsive design with mobile-first approach, light/dark themes, and intuitive navigation.
+4.  **Ship It.** A functional experiment is better than a perfect plan. The features here are probes into different aspects of the Web Audio API.
 
 ---
 
 ### Implemented Features 🧪
 
-The `html` directory contains the current set of experiments. They are largely independent.
+The `html` directory contains the current set of experiments with a redesigned, mobile-first interface:
 
-*   **`note-detection.html`**: Real-time pitch detection using `AnalyserNode`. The core challenge is balancing FFT window size for frequency resolution vs. temporal accuracy. Geometry Scope visuals live here.
-*   **`pitch-training.html`**: Home of the new **Pitch Arcade**. It embeds the modular `GamifiedPitchEngine` where scenes like **Gatekeeper** translate pitch accuracy into visual gameplay.
-*   **`ear-training.html`**: Basic note identification game.
-*   **`beatbox.html`**: Sacred Grid sequencer explores timing and scheduling with `AudioContext.currentTime`.
-*   **`recorder.html`**: Audio capture via `MediaRecorder`. Simple, but it works.
+*   **`index.html`**: Beautiful home page with hero section, feature highlights, and comprehensive overview
+*   **`note-detection.html`**: Real-time pitch detection using `AnalyserNode` with geometry scope visuals
+*   **`pitch-training.html`**: Home of the **Pitch Arcade** with gamified learning modes and visual feedback
+*   **`ear-training.html`**: Comprehensive ear training exercises with detailed descriptions
+*   **`beatbox.html`**: Sacred Grid sequencer with enhanced drum machine and vocal recording
+*   **`recorder.html`**: Audio capture via `MediaRecorder` with modern interface
+*   **`features.html`**: Detailed feature showcase with specifications and capabilities
+*   **`about.html`**: Project mission, technology stack, and vision
+
+#### UI/UX Enhancements ✨
+
+- **Mobile-First Design**: Responsive layout optimized for all screen sizes
+- **Light/Dark Theme Toggle**: Smooth transitions with localStorage persistence
+- **Hamburger Navigation**: Slide-down menu for mobile devices
+- **Retro-Bright Aesthetic**: Vibrant color scheme with thoughtful contrasts
+- **Micro-interactions**: Hover effects, animations, and visual feedback throughout
+- **Accessibility**: Semantic HTML, ARIA labels, and keyboard navigation support
 
 ---
 
@@ -30,8 +43,8 @@ Prerequisites: `node` and `npm`.
 
 1.  **Clone the repository.**
     ```bash
-    git clone https://github.com/yourusername/AUDIATIONstation.git
-    cd AUDIATIONstation
+    git clone https://github.com/AlexBaldman/audiationSTATION.git
+    cd audiationSTATION
     ```
 2.  **Install dependencies.**
     ```bash
@@ -48,7 +61,7 @@ Prerequisites: `node` and `npm`.
     npm run test   # Vitest coverage (PitchTraining, Beatbox, Gamified engine, etc.)
     npm run deploy # Runs tests, builds with Vite, publishes to gh-pages
     ```
-   The project deploys to GitHub Pages at `https://alexbaldman.github.io/audiationSTATION/`. Vite’s `base` is configured accordingly.
+   The project deploys to GitHub Pages at `https://alexbaldman.github.io/audiationSTATION/`. Vite's `base` is configured accordingly.
 
 ---
 
@@ -58,7 +71,7 @@ Prerequisites: `node` and `npm`.
 html/             # Multi-page entry points (loaded by Vite)
 js/pages/         # Page bootstrap scripts (DOM wiring only)
 js/modules/       # Shared logic (GamifiedPitchEngine, PitchTraining, NoteDetection, etc.)
-css/main.css      # Global styling
+css/main.css      # Global styling with mobile-first responsive design
 docs/             # Developer & concept docs (GAMIFIED_PITCH_ENGINE, SONIC_GEOMETRY)
 tests/            # Vitest suites for core modules
 ```
