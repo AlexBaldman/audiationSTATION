@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AUDIATIONstation</title>
     <link rel="stylesheet" href="/css/main.css">
-  <script type="module" crossorigin src="/audiationSTATION/assets/ear-training-uMfQMfj3.js"></script>
+  <script type="module" crossorigin src="/audiationSTATION/assets/ear-training-BAhwMDRo.js"></script>
   <link rel="modulepreload" crossorigin href="/audiationSTATION/assets/Navigation-Ct1b79JU.js">
 </head>
 <body>
@@ -98,8 +98,64 @@
                 </div>
 
                 <div class="coming-soon-notice">
-                    <h3>Coming Soon!</h3>
-                    <p>We're currently developing these ear training exercises with interactive audio examples, immediate feedback, and progress tracking. Sign up for our newsletter to be notified when they launch!</p>
+                    <h3>Interactive Ear Training Exercises</h3>
+                    <p>Try our comprehensive ear training exercises with real-time audio feedback and progress tracking!</p>
+                </div>
+
+                <div class="ear-training-controls">
+                    <div class="exercise-selector">
+                        <h4>Exercise Type</h4>
+                        <div class="button-group">
+                            <button class="exercise-type-btn active" data-type="interval">Intervals</button>
+                            <button class="exercise-type-btn" data-type="chord">Chords</button>
+                            <button class="exercise-type-btn" data-type="rhythm">Rhythm</button>
+                            <button class="exercise-type-btn" data-type="melody">Melody</button>
+                        </div>
+                    </div>
+
+                    <div class="difficulty-selector">
+                        <h4>Difficulty</h4>
+                        <div class="button-group">
+                            <button class="difficulty-btn active" data-difficulty="easy">Easy</button>
+                            <button class="difficulty-btn" data-difficulty="medium">Medium</button>
+                            <button class="difficulty-btn" data-difficulty="hard">Hard</button>
+                        </div>
+                    </div>
+
+                    <div class="exercise-display">
+                        <div class="exercise-info">
+                            <h4>Current Exercise</h4>
+                            <p><span id="exercise-type">Interval</span> - <span id="exercise-difficulty">Easy</span></p>
+                            <p id="exercise-info">Melodic interval</p>
+                        </div>
+
+                        <div class="exercise-controls">
+                            <button id="play-exercise" class="control-button primary">Play</button>
+                            <button id="new-exercise" class="control-button secondary">New Exercise</button>
+                        </div>
+                    </div>
+
+                    <div class="answer-section">
+                        <div class="answer-input">
+                            <label for="answer-input">Your Answer:</label>
+                            <input type="text" id="answer-input" placeholder="Enter your answer..." autocomplete="off">
+                            <button id="submit-answer" class="control-button primary">Submit</button>
+                        </div>
+
+                        <div id="result-display" class="result-display"></div>
+                        <div id="error-display" class="error-display"></div>
+                    </div>
+
+                    <div class="progress-section">
+                        <div class="score-display">
+                            <h4>Score</h4>
+                            <p><span id="score-display">0/0</span></p>
+                        </div>
+                        <div class="accuracy-display">
+                            <h4>Accuracy</h4>
+                            <p><span id="accuracy-display">0%</span></p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
