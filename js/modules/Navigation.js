@@ -6,15 +6,23 @@ export class Navigation {
         this.navLinks = document.querySelectorAll(".main-nav a");
         this.hamburgerMenu = document.querySelector(".hamburger-menu");
         this.mainNav = document.querySelector(".main-nav");
+        this.themeToggle = document.querySelector(".theme-toggle");
+        this.sunIcon = document.querySelector(".sun-icon");
+        this.moonIcon = document.querySelector(".moon-icon");
         this.isOpen = false;
 
         this.initEventListeners();
         this.updateActiveLink();
+        this.initTheme();
     }
 
     initEventListeners() {
         if (this.hamburgerMenu) {
             this.hamburgerMenu.addEventListener("click", () => this.toggleMenu());
+        }
+
+        if (this.themeToggle) {
+            this.themeToggle.addEventListener("click", () => this.toggleTheme());
         }
 
         this.navLinks.forEach(link => {
@@ -27,6 +35,30 @@ export class Navigation {
                 this.closeMenu();
             });
         });
+    }
+
+    initTheme() {
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        this.setTheme(savedTheme);
+    }
+
+    toggleTheme() {
+        const currentTheme = document.documentElement.classList.contains('light') ? 'light' : 'dark';
+        const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+        this.setTheme(newTheme);
+    }
+
+    setTheme(theme) {
+        if (theme === 'light') {
+            document.documentElement.classList.add('light');
+            if (this.sunIcon) this.sunIcon.style.display = 'block';
+            if (this.moonIcon) this.moonIcon.style.display = 'none';
+        } else {
+            document.documentElement.classList.remove('light');
+            if (this.sunIcon) this.sunIcon.style.display = 'none';
+            if (this.moonIcon) this.moonIcon.style.display = 'block';
+        }
+        localStorage.setItem('theme', theme);
     }
 
     toggleMenu() {
