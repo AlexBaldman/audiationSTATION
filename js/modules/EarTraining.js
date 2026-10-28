@@ -10,6 +10,8 @@ export class EarTraining {
         this.score = 0;
         this.totalAttempts = 0;
         this.progress = new Map();
+        this.answered = false;
+        this.activeOscillators = new Set();
         this.difficulty = 'easy';
         this.exerciseType = 'interval';
         
@@ -19,22 +21,57 @@ export class EarTraining {
             ...options
         };
         
-        this.init();
+        this.restoreProgress();
     }
 
     async init() {
-        try {
-            this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            console.log('EarTraining: AudioContext initialized');
-        } catch (error) {
-            console.error('EarTraining: Failed to initialize AudioContext:', error);
+        if (!this.audioContext) {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            if (!AudioContext) throw new Error('Web Audio is unavailable in this browser.');
+            this.audioContext = new AudioContext();
         }
+        if (this.audioContext.state === 'suspended') await this.audioContext.resume();
+    }
+
+    restoreProgress() {
+        try {
+            const saved = JSON.parse(localStorage.getItem('audiation-station:ear-rational:v1'));
+            if (saved && Number.isInteger(saved.score) && Number.isInteger(saved.totalAttempts)
+                && saved.score >= 0 && saved.totalAttempts >= saved.score) {
+                this.score = saved.score;
+                this.totalAttempts = saved.totalAttempts;
+                this.progress = new Map(Object.entries(saved.progress || {}));
+            }
+        } catch { /* Practice still works when browser storage is unavailable. */ }
+    }
+
+    saveProgress() {
+        try {
+            localStorage.setItem('audiation-station:ear-rational:v1', JSON.stringify(this.getProgress()));
+        } catch { /* Scoring remains available for this session. */ }
+    }
+
+    stopPlayback() {
+        this.activeOscillators.forEach(oscillator => {
+            try { oscillator.stop(); } catch { /* Already ended. */ }
+        });
+        this.activeOscillators.clear();
+    }
+
+    getExerciseDuration() {
+        const exercise = this.currentExercise;
+        if (!exercise) return 0;
+        if (exercise.type === 'melody') return exercise.melody.length * 60 / exercise.tempo;
+        if (exercise.type === 'rhythm') return exercise.rhythm.length * 60 / exercise.tempo * exercise.stepBeats;
+        return 1;
     }
 
     /**
      * Generate a new exercise based on type and difficulty
      */
     generateExercise(type = 'interval', difficulty = 'easy') {
+        this.stopPlayback();
+        this.answered = false;
         this.exerciseType = type;
         this.difficulty = difficulty;
         
@@ -107,6 +144,7 @@ export class EarTraining {
             meter,
             rhythm,
             answer: this.rhythmToString(rhythm),
+            stepBeats: 4 / Number(meter.split('/')[1]) / (difficulty === 'easy' ? 1 : 2),
             tempo: this.options.tempo
         };
     }
@@ -123,6 +161,7 @@ export class EarTraining {
             difficulty,
             key,
             melody,
+            tempo: this.options.tempo,
             answer: this.melodyToString(melody)
         };
     }
@@ -131,9 +170,10 @@ export class EarTraining {
      * Play the current exercise audio
      */
     async playExercise() {
-        if (!this.audioContext) {
-            throw new Error('AudioContext not initialized');
-        }
+        const exercise = this.currentExercise;
+        await this.init();
+        if (exercise !== this.currentExercise) return;
+        this.stopPlayback();
         
         if (!this.currentExercise) {
             throw new Error('No exercise to play');
@@ -193,8 +233,8 @@ export class EarTraining {
      * Play rhythm exercise
      */
     async playRhythmExercise() {
-        const { rhythm, tempo } = this.currentExercise;
-        const beatDuration = 60 / tempo;
+        const { rhythm, tempo, stepBeats } = this.currentExercise;
+        const beatDuration = 60 / tempo * stepBeats;
         const now = this.audioContext.currentTime;
         
         rhythm.forEach((beat, index) => {
@@ -237,6 +277,12 @@ export class EarTraining {
         gainNode.gain.linearRampToValueAtTime(this.options.volume, startTime + 0.01);
         gainNode.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
         
+        this.activeOscillators.add(oscillator);
+        oscillator.onended = () => {
+            this.activeOscillators.delete(oscillator);
+            oscillator.disconnect();
+            gainNode.disconnect();
+        };
         oscillator.start(startTime);
         oscillator.stop(startTime + duration);
     }
@@ -249,6 +295,8 @@ export class EarTraining {
             throw new Error('No exercise to validate');
         }
         
+        if (this.answered) throw new Error('Choose New Exercise to continue.');
+        this.answered = true;
         this.totalAttempts++;
         const isCorrect = this.compareAnswers(userAnswer, this.currentExercise.answer);
         
@@ -259,6 +307,7 @@ export class EarTraining {
             this.updateProgress(false);
         }
         
+        this.saveProgress();
         return {
             correct: isCorrect,
             userAnswer,
@@ -306,55 +355,43 @@ export class EarTraining {
      * Helper methods for exercise generation
      */
     getIntervalsForDifficulty(difficulty) {
-        const intervals = {
-            easy: [
-                { name: 'unison', semitones: 0 },
-                { name: 'major 2nd', semitones: 2 },
-                { name: 'major 3rd', semitones: 4 },
-                { name: 'perfect 4th', semitones: 5 },
-                { name: 'perfect 5th', semitones: 7 }
-            ],
-            medium: [
-                ...this.getIntervalsForDifficulty('easy'),
-                { name: 'minor 2nd', semitones: 1 },
-                { name: 'minor 3rd', semitones: 3 },
-                { name: 'tritone', semitones: 6 },
-                { name: 'major 6th', semitones: 9 },
-                { name: 'minor 6th', semitones: 8 }
-            ],
-            hard: [
-                ...this.getIntervalsForDifficulty('medium'),
-                { name: 'minor 7th', semitones: 10 },
-                { name: 'major 7th', semitones: 11 },
-                { name: 'octave', semitones: 12 },
-                { name: 'minor 9th', semitones: 13 },
-                { name: 'major 9th', semitones: 14 }
-            ]
-        };
-        
-        return intervals[difficulty] || intervals.easy;
+        const easy = [
+            { name: 'unison', semitones: 0 },
+            { name: 'major 2nd', semitones: 2 },
+            { name: 'major 3rd', semitones: 4 },
+            { name: 'perfect 4th', semitones: 5 },
+            { name: 'perfect 5th', semitones: 7 }
+        ];
+        if (difficulty === 'easy') return easy;
+        const medium = [...easy,
+            { name: 'minor 2nd', semitones: 1 }, { name: 'minor 3rd', semitones: 3 },
+            { name: 'tritone', semitones: 6 }, { name: 'major 6th', semitones: 9 },
+            { name: 'minor 6th', semitones: 8 }
+        ];
+        if (difficulty !== 'hard') return medium;
+        return [...medium,
+            { name: 'minor 7th', semitones: 10 }, { name: 'major 7th', semitones: 11 },
+            { name: 'octave', semitones: 12 }, { name: 'minor 9th', semitones: 13 },
+            { name: 'major 9th', semitones: 14 }
+        ];
     }
 
     getChordsForDifficulty(difficulty) {
-        const chords = {
-            easy: [
-                { name: 'major', intervals: [0, 4, 7] },
-                { name: 'minor', intervals: [0, 3, 7] }
-            ],
-            medium: [
-                ...this.getChordsForDifficulty('easy'),
-                { name: 'diminished', intervals: [0, 3, 6] },
-                { name: 'augmented', intervals: [0, 4, 8] }
-            ],
-            hard: [
-                ...this.getChordsForDifficulty('medium'),
-                { name: 'major 7th', intervals: [0, 4, 7, 11] },
-                { name: 'minor 7th', intervals: [0, 3, 7, 10] },
-                { name: 'dominant 7th', intervals: [0, 4, 7, 10] }
-            ]
-        };
-        
-        return chords[difficulty] || chords.easy;
+        const easy = [
+            { name: 'major', intervals: [0, 4, 7] },
+            { name: 'minor', intervals: [0, 3, 7] }
+        ];
+        if (difficulty === 'easy') return easy;
+        const medium = [...easy,
+            { name: 'diminished', intervals: [0, 3, 6] },
+            { name: 'augmented', intervals: [0, 4, 8] }
+        ];
+        if (difficulty !== 'hard') return medium;
+        return [...medium,
+            { name: 'major 7th', intervals: [0, 4, 7, 11] },
+            { name: 'minor 7th', intervals: [0, 3, 7, 10] },
+            { name: 'dominant 7th', intervals: [0, 4, 7, 10] }
+        ];
     }
 
     getMetersForDifficulty(difficulty) {
@@ -400,26 +437,9 @@ export class EarTraining {
     }
 
     generateRhythmPattern(meter, difficulty) {
-        const [beatsPerMeasure, beatUnit] = meter.split('/').map(Number);
-        const pattern = [];
-        
-        for (let i = 0; i < beatsPerMeasure; i++) {
-            if (difficulty === 'easy') {
-                pattern.push(Math.random() > 0.3 ? 1 : 0); // 70% chance of note
-            } else if (difficulty === 'medium') {
-                pattern.push(Math.random() > 0.2 ? 1 : 0); // 80% chance of note
-            } else {
-                // Hard: include subdivisions
-                if (Math.random() > 0.5) {
-                    pattern.push(1, 0.5); // Eighth note pattern
-                    i += 0.5;
-                } else {
-                    pattern.push(1);
-                }
-            }
-        }
-        
-        return pattern;
+        const beats = Number(meter.split('/')[0]);
+        const slots = beats * (difficulty === 'easy' ? 1 : 2);
+        return Array.from({ length: slots }, (_, index) => index === 0 || Math.random() > 0.35 ? 1 : 0);
     }
 
     getRandomKey() {
@@ -434,7 +454,7 @@ export class EarTraining {
         
         for (let i = 0; i < melodyLength; i++) {
             const noteIndex = Math.floor(Math.random() * scale.length);
-            melody.push(scale[noteIndex]);
+            melody.push({ frequency: scale[noteIndex], name: String(noteIndex + 1) });
         }
         
         return melody;
@@ -476,6 +496,7 @@ export class EarTraining {
      * Cleanup resources
      */
     dispose() {
+        this.stopPlayback();
         if (this.audioContext) {
             this.audioContext.close();
             this.audioContext = null;

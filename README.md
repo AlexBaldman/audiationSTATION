@@ -20,7 +20,7 @@ The `html` directory contains the current set of experiments with a redesigned, 
 *   **`index.html`**: Beautiful home page with hero section, feature highlights, and comprehensive overview
 *   **`note-detection.html`**: Real-time pitch detection using `AnalyserNode` with geometry scope visuals
 *   **`pitch-training.html`**: Home of the **Pitch Arcade** with gamified learning modes and visual feedback
-*   **`ear-training.html`**: Comprehensive ear training exercises with detailed descriptions
+*   **`ear-training.html`**: **Ear Rational**, Audiation Station’s listening room for intervals, chords, rhythm patterns and scale-degree dictation, with replay and browser-saved scores
 *   **`beatbox.html`**: Sacred Grid sequencer with enhanced drum machine and vocal recording
 *   **`recorder.html`**: Audio capture via `MediaRecorder` with modern interface
 *   **`features.html`**: Detailed feature showcase with specifications and capabilities

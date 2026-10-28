@@ -1,8 +1,4 @@
-/**
- * Ear Training Page Controller
- * Handles UI interactions and coordinates with the EarTraining module
- */
-
+/** Ear Rational: the listening room inside Audiation Station. */
 import { Navigation } from '../modules/Navigation.js';
 import { EarTraining } from '../modules/EarTraining.js';
 
@@ -10,256 +6,149 @@ export class EarTrainingPage {
     constructor() {
         this.navigation = new Navigation();
         this.earTraining = new EarTraining();
-        this.currentExercise = null;
-        this.isPlaying = false;
-        
-        this.init();
-    }
-
-    init() {
-        this.setupEventListeners();
-        this.initializeControls();
-        this.hideComingSoonMessage();
-    }
-
-    setupEventListeners() {
-        // Exercise type buttons
-        const exerciseButtons = document.querySelectorAll('.exercise-type-btn');
-        exerciseButtons.forEach(button => {
-            button.addEventListener('click', (e) => {
-                this.selectExerciseType(e.target.dataset.type);
+        this.type = 'interval';
+        this.difficulty = 'easy';
+        this.playbackId = 0;
+        this.playing = false;
+        this.heard = false;
+        document.querySelectorAll('.exercise-type-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                this.type = button.dataset.type;
+                this.generateNewExercise();
             });
         });
-
-        // Difficulty buttons
-        const difficultyButtons = document.querySelectorAll('.difficulty-btn');
-        difficultyButtons.forEach(button => {
-            button.addEventListener('click', (e) => {
-                this.selectDifficulty(e.target.dataset.difficulty);
+        document.querySelectorAll('.difficulty-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                this.difficulty = button.dataset.difficulty;
+                this.generateNewExercise();
             });
         });
+        this.element('play-exercise').addEventListener('click', () => this.playExercise());
+        this.element('new-exercise').addEventListener('click', () => this.generateNewExercise());
+        this.element('submit-answer').addEventListener('click', () => this.submitAnswer());
+        this.element('answer-input').addEventListener('keydown', event => {
+            if (event.key === 'Enter') this.submitAnswer();
+        });
+        window.addEventListener('pagehide', () => {
+            this.playbackId++;
+            this.earTraining.stopPlayback();
+        });
+        this.generateNewExercise();
+        this.updateScoreDisplay();
+    }
 
-        // Control buttons
-        const playButton = document.getElementById('play-exercise');
-        const answerButton = document.getElementById('submit-answer');
-        const newExerciseButton = document.getElementById('new-exercise');
+    element(id) { return document.getElementById(id); }
 
-        if (playButton) {
-            playButton.addEventListener('click', () => this.playExercise());
-        }
-        if (answerButton) {
-            answerButton.addEventListener('click', () => this.submitAnswer());
-        }
-        if (newExerciseButton) {
-            newExerciseButton.addEventListener('click', () => this.generateNewExercise());
-        }
-
-        // Answer input
-        const answerInput = document.getElementById('answer-input');
-        if (answerInput) {
-            answerInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    this.submitAnswer();
-                }
+    generateNewExercise() {
+        this.playbackId++;
+        this.playing = false;
+        this.heard = false;
+        this.currentExercise = this.earTraining.generateExercise(this.type, this.difficulty);
+        for (const [selector, key, value] of [
+            ['.exercise-type-btn', 'type', this.type],
+            ['.difficulty-btn', 'difficulty', this.difficulty]
+        ]) {
+            document.querySelectorAll(selector).forEach(button => {
+                const active = button.dataset[key] === value;
+                button.classList.toggle('active', active);
+                button.setAttribute('aria-pressed', String(active));
             });
         }
-    }
-
-    initializeControls() {
-        // Set initial exercise type and difficulty
-        this.selectExerciseType('interval');
-        this.selectDifficulty('easy');
-        this.generateNewExercise();
-    }
-
-    hideComingSoonMessage() {
-        const comingSoonNotice = document.querySelector('.coming-soon-notice');
-        if (comingSoonNotice) {
-            comingSoonNotice.style.display = 'none';
-        }
-    }
-
-    selectExerciseType(type) {
-        // Update UI
-        const buttons = document.querySelectorAll('.exercise-type-btn');
-        buttons.forEach(button => {
-            button.classList.toggle('active', button.dataset.type === type);
+        this.element('exercise-type').textContent = this.type;
+        this.element('exercise-difficulty').textContent = this.difficulty;
+        const exercise = this.currentExercise;
+        const instructions = {
+            interval: exercise.harmonic ? 'Two notes together. What is the interval?' : 'Two notes in sequence. What is the interval?',
+            chord: 'Listen to the chord. Which quality do you hear?',
+            rhythm: `${exercise.meter} at ${exercise.tempo} BPM. Enter x for each hit and - for each rest. ${exercise.rhythm?.length} slots; ${exercise.stepBeats} quarter-note beats per slot.`,
+            melody: `Key of ${exercise.key}. Enter scale degrees 1–8 in order (1 = tonic, 8 = upper tonic). ${exercise.melody?.length} notes.`
+        };
+        this.element('exercise-info').textContent = instructions[this.type];
+        this.element('play-exercise').textContent = 'Listen';
+        this.element('play-exercise').disabled = false;
+        this.element('answer-input').value = '';
+        this.element('answer-input').placeholder = this.type === 'rhythm' ? 'e.g. x - x x' : 'e.g. 1 3 5 1';
+        this.element('answer-input').disabled = true;
+        this.element('answer-input').parentElement.hidden = !['rhythm', 'melody'].includes(this.type);
+        const result = this.element('result-display');
+        result.textContent = 'Listen first, then choose your answer. Replay as often as you like.';
+        result.className = 'result-display';
+        this.element('error-display').style.display = 'none';
+        const choices = this.element('answer-choices');
+        choices.replaceChildren();
+        const options = this.type === 'interval' ? this.earTraining.getIntervalsForDifficulty(this.difficulty)
+            : this.type === 'chord' ? this.earTraining.getChordsForDifficulty(this.difficulty) : [];
+        options.forEach(option => {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'control-button secondary';
+            button.textContent = option.name;
+            button.disabled = true;
+            button.addEventListener('click', () => this.submitAnswer(option.name));
+            choices.append(button);
         });
-
-        // Generate new exercise
-        this.generateNewExercise();
     }
 
-    selectDifficulty(difficulty) {
-        // Update UI
-        const buttons = document.querySelectorAll('.difficulty-btn');
-        buttons.forEach(button => {
-            button.classList.toggle('active', button.dataset.difficulty === difficulty);
-        });
-
-        // Generate new exercise
-        this.generateNewExercise();
-    }
-
-    async generateNewExercise() {
-        try {
-            const exerciseType = document.querySelector('.exercise-type-btn.active')?.dataset.type || 'interval';
-            const difficulty = document.querySelector('.difficulty-btn.active')?.dataset.difficulty || 'easy';
-            
-            this.currentExercise = this.earTraining.generateExercise(exerciseType, difficulty);
-            this.updateExerciseDisplay();
-            this.clearAnswer();
-        } catch (error) {
-            console.error('Failed to generate exercise:', error);
-            this.showError('Failed to generate exercise. Please try again.');
-        }
+    setAnswerEnabled(enabled) {
+        this.element('answer-input').disabled = !enabled;
+        this.element('submit-answer').disabled = !enabled;
+        this.element('answer-choices').querySelectorAll('button').forEach(button => { button.disabled = !enabled; });
     }
 
     async playExercise() {
-        if (this.isPlaying) return;
-        
+        if (this.playing) return;
+        const id = ++this.playbackId;
+        this.playing = true;
+        this.element('play-exercise').disabled = true;
+        this.element('play-exercise').textContent = 'Listening…';
         try {
-            this.isPlaying = true;
-            this.updatePlayButton('Playing...');
-            
             await this.earTraining.playExercise();
-            
-            // Reset play button after exercise duration
+            if (id !== this.playbackId) return;
             setTimeout(() => {
-                this.isPlaying = false;
-                this.updatePlayButton('Play Again');
-            }, 2000);
-            
+                if (id !== this.playbackId) return;
+                this.playing = false;
+                this.heard = true;
+                this.element('play-exercise').disabled = false;
+                this.element('play-exercise').textContent = 'Replay';
+                this.setAnswerEnabled(!this.earTraining.answered);
+            }, this.earTraining.getExerciseDuration() * 1000 + 100);
         } catch (error) {
-            console.error('Failed to play exercise:', error);
-            this.showError('Failed to play exercise. Please check your audio settings.');
-            this.isPlaying = false;
-            this.updatePlayButton('Play');
+            if (id !== this.playbackId) return;
+            this.playing = false;
+            this.element('play-exercise').disabled = false;
+            this.element('play-exercise').textContent = 'Try audio again';
+            this.showError(error.message);
         }
     }
 
-    submitAnswer() {
-        const answerInput = document.getElementById('answer-input');
-        if (!answerInput || !answerInput.value.trim()) {
-            this.showError('Please enter an answer.');
-            return;
-        }
-
-        try {
-            const result = this.earTraining.validateAnswer(answerInput.value.trim());
-            this.showResult(result);
-            this.updateScoreDisplay();
-            
-            if (result.correct) {
-                // Generate new exercise after a delay
-                setTimeout(() => this.generateNewExercise(), 2000);
-            }
-            
-        } catch (error) {
-            console.error('Failed to validate answer:', error);
-            this.showError('Failed to validate answer. Please try again.');
-        }
-    }
-
-    updateExerciseDisplay() {
-        const exerciseTypeDisplay = document.getElementById('exercise-type');
-        const difficultyDisplay = document.getElementById('exercise-difficulty');
-        const exerciseInfo = document.getElementById('exercise-info');
-        
-        if (exerciseTypeDisplay) {
-            exerciseTypeDisplay.textContent = this.currentExercise.type.charAt(0).toUpperCase() + this.currentExercise.type.slice(1);
-        }
-        
-        if (difficultyDisplay) {
-            difficultyDisplay.textContent = this.currentExercise.difficulty.charAt(0).toUpperCase() + this.currentExercise.difficulty.slice(1);
-        }
-        
-        if (exerciseInfo) {
-            let info = '';
-            switch (this.currentExercise.type) {
-                case 'interval':
-                    info = this.currentExercise.harmonic ? 'Harmonic interval' : 'Melodic interval';
-                    break;
-                case 'chord':
-                    info = `${this.currentExercise.chordType.name} chord`;
-                    break;
-                case 'rhythm':
-                    info = `${this.currentExercise.meter} meter at ${this.currentExercise.tempo} BPM`;
-                    break;
-                case 'melody':
-                    info = `Melody in ${this.currentExercise.key}`;
-                    break;
-            }
-            exerciseInfo.textContent = info;
-        }
-    }
-
-    updatePlayButton(text) {
-        const playButton = document.getElementById('play-exercise');
-        if (playButton) {
-            playButton.textContent = text;
-            playButton.disabled = this.isPlaying;
-        }
-    }
-
-    clearAnswer() {
-        const answerInput = document.getElementById('answer-input');
-        if (answerInput) {
-            answerInput.value = '';
-            answerInput.focus();
-        }
-        
-        // Clear previous result
-        const resultDisplay = document.getElementById('result-display');
-        if (resultDisplay) {
-            resultDisplay.textContent = '';
-            resultDisplay.className = 'result-display';
-        }
-    }
-
-    showResult(result) {
-        const resultDisplay = document.getElementById('result-display');
-        if (!resultDisplay) return;
-        
-        resultDisplay.textContent = result.correct ? '✓ Correct!' : `✗ Incorrect. The answer was: ${result.correctAnswer}`;
-        resultDisplay.className = `result-display ${result.correct ? 'correct' : 'incorrect'}`;
-        
-        // Clear answer input
-        const answerInput = document.getElementById('answer-input');
-        if (answerInput) {
-            answerInput.value = '';
-        }
+    submitAnswer(choice) {
+        if (!this.heard || this.earTraining.answered) return;
+        let answer = choice || this.element('answer-input').value.trim();
+        if (!answer) return this.showError('Enter your answer first.');
+        answer = answer.replace(/\s+/g, ' ');
+        const result = this.earTraining.validateAnswer(answer);
+        this.element('result-display').textContent = result.correct
+            ? '✓ Correct. Replay to hear it again, or choose New Exercise.'
+            : `The answer is ${result.correctAnswer}. Replay and listen for the difference, then choose New Exercise.`;
+        this.element('result-display').className = `result-display ${result.correct ? 'correct' : 'incorrect'}`;
+        this.setAnswerEnabled(false);
+        this.updateScoreDisplay();
     }
 
     updateScoreDisplay() {
         const progress = this.earTraining.getProgress();
-        const scoreDisplay = document.getElementById('score-display');
-        const accuracyDisplay = document.getElementById('accuracy-display');
-        
-        if (scoreDisplay) {
-            scoreDisplay.textContent = `${progress.score}/${progress.totalAttempts}`;
-        }
-        
-        if (accuracyDisplay) {
-            accuracyDisplay.textContent = `${progress.accuracy}%`;
-        }
+        this.element('score-display').textContent = `${progress.score}/${progress.totalAttempts}`;
+        this.element('accuracy-display').textContent = `${progress.accuracy}%`;
     }
 
     showError(message) {
-        const errorDisplay = document.getElementById('error-display');
-        if (errorDisplay) {
-            errorDisplay.textContent = message;
-            errorDisplay.style.display = 'block';
-            
-            // Hide after 3 seconds
-            setTimeout(() => {
-                errorDisplay.style.display = 'none';
-            }, 3000);
-        }
+        this.element('error-display').textContent = message;
+        this.element('error-display').style.display = 'block';
     }
 }
 
-// Initialize when DOM is ready
-document.addEventListener('DOMContentLoaded', () => {
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => new EarTrainingPage(), { once: true });
+} else {
     new EarTrainingPage();
-});
+}
