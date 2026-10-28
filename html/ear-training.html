@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AUDIATIONstation</title>
-    <link rel="stylesheet" href="/css/main.css">
+    <title>Ear Rational · Audiation Station</title>
+    <meta name="description" content="Ear Rational, the listening room inside Audiation Station. Practice intervals, chords, rhythm and melody.">
+    <link rel="stylesheet" href="../css/main.css">
 </head>
 <body>
     <header class="sticky-header">
@@ -20,7 +21,7 @@
                     <li><a href="recorder.html">Recorder</a></li>
                     <li><a href="pitch-training.html">Pitch Training</a></li>
                     <li><a href="note-detection.html">Note Detection</a></li>
-                    <li><a href="ear-training.html">Ear Training</a></li>
+                    <li><a href="ear-training.html">Ear Rational</a></li>
                     <li><a href="beatbox.html">Beatbox</a></li>
                 </ul>
             </nav>
@@ -45,60 +46,10 @@
     <main class="app-container">
         <section id="ear-training" class="app-section">
             <div class="section-content">
-                <h2 class="section-title">Ear Training</h2>
-                <p class="section-subtitle">Develop your musical ear with comprehensive training exercises</p>
-                
-                <div class="ear-training-intro">
-                    <p>Ear training is essential for any musician looking to improve their ability to identify pitches, intervals, chords, and rhythms by ear. Our structured exercises will help you develop this crucial skill.</p>
-                </div>
-
-                <div class="feature-grid">
-                    <div class="feature-item">
-                        <div class="feature-icon">🎵</div>
-                        <h3>Interval Recognition</h3>
-                        <p>Learn to identify the distance between two notes, from simple seconds to complex compound intervals.</p>
-                        <ul class="feature-details">
-                            <li>Ascending and descending intervals</li>
-                            <li>Harmonic and melodic intervals</li>
-                            <li>Customizable difficulty levels</li>
-                        </ul>
-                    </div>
-                    <div class="feature-item">
-                        <div class="feature-icon">🎹</div>
-                        <h3>Chord Identification</h3>
-                        <p>Master the art of recognizing different chord types and their inversions by ear.</p>
-                        <ul class="feature-details">
-                            <li>Major, minor, and diminished chords</li>
-                            <li>Seventh chords and extensions</li>
-                            <li>Chord progressions</li>
-                        </ul>
-                    </div>
-                    <div class="feature-item">
-                        <div class="feature-icon">🥁</div>
-                        <h3>Rhythm Training</h3>
-                        <p>Develop your sense of rhythm through exercises in meter, tempo, and rhythmic patterns.</p>
-                        <ul class="feature-details">
-                            <li>Meter identification</li>
-                            <li>Rhythmic dictation</li>
-                            <li>Tempo recognition</li>
-                        </ul>
-                    </div>
-                    <div class="feature-item">
-                        <div class="feature-icon">🎼</div>
-                        <h3>Melodic Dictation</h3>
-                        <p>Train your ability to notate melodies by ear, a fundamental skill for musicians and composers.</p>
-                        <ul class="feature-details">
-                            <li>Step-wise motion recognition</li>
-                            <li>Leap identification</li>
-                            <li>Key signature detection</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="coming-soon-notice">
-                    <h3>Interactive Ear Training Exercises</h3>
-                    <p>Try our comprehensive ear training exercises with real-time audio feedback and progress tracking!</p>
-                </div>
+                <p class="section-subtitle">AUDIATION STATION / THE LISTENING ROOM</p>
+                <h1 class="section-title">Ear Rational</h1>
+                <p class="section-subtitle">Make sense of what you hear.</p>
+                <p class="ear-training-intro">Listen, make a call, then hear it again with the answer in mind. Start with intervals or chords; explore rhythm and scale-degree dictation when you’re ready. Your score stays in this browser.</p>
 
                 <div class="ear-training-controls">
                     <div class="exercise-selector">
@@ -134,19 +85,20 @@
                     </div>
 
                     <div class="answer-section">
-                        <div class="answer-input">
+                        <div id="answer-choices" class="button-group" role="group" aria-label="Choose your answer"></div>
+                        <div class="answer-input" hidden>
                             <label for="answer-input">Your Answer:</label>
                             <input type="text" id="answer-input" placeholder="Enter your answer..." autocomplete="off">
-                            <button id="submit-answer" class="control-button primary">Submit</button>
+                            <button id="submit-answer" disabled class="control-button primary">Submit</button>
                         </div>
 
-                        <div id="result-display" class="result-display"></div>
-                        <div id="error-display" class="error-display"></div>
+                        <div id="result-display" class="result-display" role="status" aria-live="polite"></div>
+                        <div id="error-display" class="error-display" role="alert"></div>
                     </div>
 
                     <div class="progress-section">
                         <div class="score-display">
-                            <h4>Score</h4>
+                            <h4>Saved score</h4>
                             <p><span id="score-display">0/0</span></p>
                         </div>
                         <div class="accuracy-display">

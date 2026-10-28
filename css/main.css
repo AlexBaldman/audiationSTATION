@@ -1169,3 +1169,12 @@ footer {
         gap: 1rem;
     }
 }
+/* Ear Rational answer controls share the Station's existing visual language. */
+#ear-training [hidden] { display: none !important; }
+#answer-choices { margin-bottom: 1rem; }
+#answer-choices button { min-height: 48px; flex: 1 1 140px; }
+#ear-training button:focus-visible { outline: 3px solid var(--color-tertiary-neon); outline-offset: 4px; }
+@media (max-width: 520px) {
+    #ear-training .ear-training-controls { padding: 1rem; }
+    #ear-training .answer-input input { min-width: 0; width: 100%; }
+}

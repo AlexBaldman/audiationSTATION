@@ -1,150 +1,87 @@
-/**
- * Ear Training Module Tests
- * Placeholder tests for future ear training functionality
- */
-
 import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { EarTraining } from '../js/modules/EarTraining.js';
 
-// Mock EarTraining class for future implementation
-class MockEarTraining {
-    constructor() {
-        this.score = 0;
-        this.currentExercise = null;
+class FakeAudioContext {
+    constructor() { this.state = 'suspended'; this.currentTime = 0; this.destination = {}; }
+    resume() { this.state = 'running'; return Promise.resolve(); }
+    createOscillator() {
+        return { connect: vi.fn(), disconnect: vi.fn(), frequency: { value: 0 }, start: vi.fn(), stop: vi.fn() };
     }
-    
-    generateExercise(type, difficulty) {
-        return { type, difficulty, answer: 'mock-answer' };
+    createGain() {
+        return { connect: vi.fn(), disconnect: vi.fn(), gain: {
+            setValueAtTime: vi.fn(), linearRampToValueAtTime: vi.fn(), exponentialRampToValueAtTime: vi.fn()
+        } };
     }
-    
-    validateAnswer(userAnswer, correctAnswer) {
-        return userAnswer === correctAnswer;
-    }
-    
-    updateScore(correct) {
-        if (correct) this.score++;
-    }
+    close() { return Promise.resolve(); }
 }
 
-describe('EarTraining', () => {
-    let earTraining;
-
-    beforeEach(() => {
-        earTraining = new MockEarTraining();
-    });
-
-    describe('Exercise Generation', () => {
-        it('should generate interval exercises', () => {
-            const exercise = earTraining.generateExercise('interval', 'easy');
-            expect(exercise.type).toBe('interval');
-            expect(exercise.difficulty).toBe('easy');
-            expect(exercise.answer).toBeDefined();
-        });
-
-        it('should generate chord exercises', () => {
-            const exercise = earTraining.generateExercise('chord', 'medium');
-            expect(exercise.type).toBe('chord');
-            expect(exercise.difficulty).toBe('medium');
-        });
-
-        it('should generate rhythm exercises', () => {
-            const exercise = earTraining.generateExercise('rhythm', 'hard');
-            expect(exercise.type).toBe('rhythm');
-            expect(exercise.difficulty).toBe('hard');
-        });
-    });
-
-    describe('Answer Validation', () => {
-        it('should validate correct answers', () => {
-            const result = earTraining.validateAnswer('C', 'C');
-            expect(result).toBe(true);
-        });
-
-        it('should reject incorrect answers', () => {
-            const result = earTraining.validateAnswer('C', 'D');
-            expect(result).toBe(false);
-        });
-    });
-
-    describe('Score Tracking', () => {
-        it('should increment score for correct answers', () => {
-            const initialScore = earTraining.score;
-            earTraining.updateScore(true);
-            expect(earTraining.score).toBe(initialScore + 1);
-        });
-
-        it('should not increment score for incorrect answers', () => {
-            const initialScore = earTraining.score;
-            earTraining.updateScore(false);
-            expect(earTraining.score).toBe(initialScore);
-        });
-    });
-
-    describe('Difficulty Progression', () => {
-        it('should track exercise difficulty', () => {
-            const exercises = [
-                earTraining.generateExercise('interval', 'easy'),
-                earTraining.generateExercise('interval', 'medium'),
-                earTraining.generateExercise('interval', 'hard')
-            ];
-            
-            expect(exercises[0].difficulty).toBe('easy');
-            expect(exercises[1].difficulty).toBe('medium');
-            expect(exercises[2].difficulty).toBe('hard');
-        });
-    });
-
-    describe('Progress Tracking', () => {
-        it('should maintain exercise history', () => {
-            const exercise1 = earTraining.generateExercise('interval', 'easy');
-            const exercise2 = earTraining.generateExercise('chord', 'medium');
-            
-            expect(exercise1.type).toBe('interval');
-            expect(exercise2.type).toBe('chord');
-        });
-    });
+beforeEach(() => {
+    localStorage.clear();
+    window.AudioContext = FakeAudioContext;
 });
 
-// Future test cases to implement:
-describe('EarTraining - Future Implementation', () => {
-    // These tests will be implemented when the full EarTraining module is created
-    
-    it('should play audio examples using Web Audio API', () => {
-        // Test: Audio playback functionality
-        // Expect: AudioContext creates oscillators and plays sounds
+describe('Ear Rational real exercise engine', () => {
+    for (const type of ['interval', 'chord', 'rhythm', 'melody']) {
+        for (const difficulty of ['easy', 'medium', 'hard']) {
+            it(`generates and plays ${difficulty} ${type} with finite audio scheduling`, async () => {
+                const trainer = new EarTraining();
+                expect(trainer.audioContext).toBeNull();
+                const exercise = trainer.generateExercise(type, difficulty);
+                expect(exercise.answer).toBeTruthy();
+                const played = vi.spyOn(trainer, 'playNote');
+                await trainer.playExercise();
+                expect(trainer.audioContext.state).toBe('running');
+                expect(played.mock.calls.length).toBeGreaterThan(0);
+                for (const call of played.mock.calls) {
+                    expect(call.every(Number.isFinite)).toBe(true);
+                    expect(call[0]).toBeGreaterThan(0);
+                    expect(call[2]).toBeGreaterThan(0);
+                }
+                expect(trainer.getExerciseDuration()).toBeGreaterThan(0);
+                trainer.dispose();
+            });
+        }
+    }
+
+    it('scores one answer per exercise and restores saved progress', () => {
+        const trainer = new EarTraining();
+        const exercise = trainer.generateExercise();
+        expect(trainer.validateAnswer(exercise.answer).correct).toBe(true);
+        expect(() => trainer.validateAnswer(exercise.answer)).toThrow('New Exercise');
+        trainer.generateExercise('chord');
+        expect(trainer.validateAnswer('wrong').correct).toBe(false);
+        expect(new EarTraining().getProgress()).toMatchObject({ score: 1, totalAttempts: 2, accuracy: '50.0' });
     });
 
-    it('should generate random intervals within specified range', () => {
-        // Test: Interval generation algorithm
-        // Expect: Generated intervals are within valid ranges
+    it('uses audible scale degrees rather than rest answers for melodies', () => {
+        const trainer = new EarTraining();
+        const exercise = trainer.generateExercise('melody');
+        expect(exercise.answer).toMatch(/^[1-8]( [1-8]){3}$/);
+        expect(exercise.tempo).toBe(120);
+        expect(exercise.melody.every(note => note.frequency > 0)).toBe(true);
     });
 
-    it('should create chord progressions with proper voice leading', () => {
-        // Test: Chord progression generation
-        // Expect: Progressions follow music theory rules
+    it('keeps rhythm slots within the announced meter including subdivisions', () => {
+        const trainer = new EarTraining();
+        for (const meter of ['4/4', '6/8', '7/8']) {
+            for (const difficulty of ['easy', 'hard']) {
+                const pattern = trainer.generateRhythmPattern(meter, difficulty);
+                const [beats, unit] = meter.split('/').map(Number);
+                const step = 4 / unit / (difficulty === 'easy' ? 1 : 2);
+                expect(pattern.length * step).toBe(beats * 4 / unit);
+                expect(pattern.every(value => value === 0 || value === 1)).toBe(true);
+            }
+        }
     });
 
-    it('should generate rhythmic patterns with correct timing', () => {
-        // Test: Rhythm pattern creation
-        // Expect: Patterns match specified meters and tempos
-    });
-
-    it('should provide immediate feedback on user answers', () => {
-        // Test: Answer feedback system
-        // Expect: Visual and audio feedback for correct/incorrect answers
-    });
-
-    it('should adapt difficulty based on user performance', () => {
-        // Test: Adaptive difficulty algorithm
-        // Expect: Difficulty increases with correct answers, decreases with mistakes
-    });
-
-    it('should save progress to localStorage', () => {
-        // Test: Progress persistence
-        // Expect: User progress is saved and restored between sessions
-    });
-
-    it('should handle audio context suspension/resumption', () => {
-        // Test: Audio context management
-        // Expect: Proper handling of browser audio policies
+    it('stops scheduled audio when switching exercises', async () => {
+        const trainer = new EarTraining();
+        trainer.generateExercise('melody');
+        await trainer.playExercise();
+        const voices = [...trainer.activeOscillators];
+        trainer.generateExercise('interval');
+        expect(voices.length).toBeGreaterThan(0);
+        expect(voices.every(voice => voice.stop.mock.calls.length === 2)).toBe(true);
+        expect(trainer.activeOscillators.size).toBe(0);
     });
 });
